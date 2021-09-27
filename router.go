@@ -71,6 +71,11 @@ func setupRouter() *gin.Engine {
 		articoliRoute.GET("/", GetArticoli)
 		articoliRoute.GET("/:id", GetArticolo)
 	}
+	citazioniRoute := r.Group("/citazioni")
+	{
+		citazioniRoute.GET("/", GetCitazioni)
+		citazioniRoute.GET("/:id", GetCitazione)
+	}
 
 	return r
 }

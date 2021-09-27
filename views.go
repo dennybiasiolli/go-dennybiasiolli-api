@@ -23,3 +23,19 @@ func GetArticolo(c *gin.Context) {
 	}
 	c.JSON(200, articolo)
 }
+
+func GetCitazioni(c *gin.Context) {
+	var citazioni []Citazione
+	db.Where(&Citazione{IsApproved: true, IsPubblica: true}).Find(&citazioni)
+	c.JSON(200, citazioni)
+}
+func GetCitazione(c *gin.Context) {
+	var citazione Citazione
+	id := c.Params.ByName("id")
+	err := db.Where(&Citazione{IsApproved: true, IsPubblica: true}).First(&citazione, id).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(200, citazione)
+}

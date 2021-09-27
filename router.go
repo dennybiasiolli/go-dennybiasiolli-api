@@ -66,5 +66,11 @@ func setupRouter() *gin.Engine {
 		}
 	})
 
+	articoliRoute := r.Group("/articoli")
+	{
+		articoliRoute.GET("/", GetArticoli)
+		articoliRoute.GET("/:id", GetArticolo)
+	}
+
 	return r
 }

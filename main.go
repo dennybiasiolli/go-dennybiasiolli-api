@@ -1,9 +1,12 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 var db = make(map[string]string)
@@ -68,7 +71,17 @@ func setupRouter() *gin.Engine {
 }
 
 func main() {
+	/*
+		loading .env files in this order, if a variable is not set in `.env`,
+		it's read from `.env.default`
+	*/
+	errEnv := godotenv.Load(".env")
+	errEnvDefault := godotenv.Load(".env.default")
+	if errEnvDefault != nil && errEnv != nil {
+		log.Fatal("Error loading .env.default or .env file")
+	}
+
 	r := setupRouter()
 	// Listen and Server in 0.0.0.0:8080
-	r.Run(":8080")
+	r.Run(os.Getenv("HTTP_LISTEN"))
 }

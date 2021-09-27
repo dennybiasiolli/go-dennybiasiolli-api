@@ -3,7 +3,7 @@ package main
 func main() {
 	getEnvVariables()
 
-	initDb()
+	connectDb()
 
 	r := setupRouter()
 	// Listen and Server in 0.0.0.0:8080

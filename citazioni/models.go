@@ -15,3 +15,8 @@ type Citazione struct {
 func (Citazione) TableName() string {
 	return "citazioni_citazione_go"
 }
+
+type CreateCitazioneInput struct {
+	Frase  string `json:"frase" binding:"required"`
+	Autore string `json:"autore" binding:"required"`
+}

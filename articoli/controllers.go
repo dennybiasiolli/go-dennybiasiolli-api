@@ -12,8 +12,16 @@ import (
 func ArticoliList(c *gin.Context) {
 	db := common.GetDB()
 	var articoli []Articolo
-	db.Where("data_pubblicazione IS NOT NULL").Find(&articoli)
-	c.JSON(200, articoli)
+	var count int64
+	err := db.Where("data_pubblicazione IS NOT NULL").Find(&articoli).Order("-id").Count(&count).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"results": ArticoliSerializer(articoli),
+		"count":   count,
+	})
 }
 
 func ArticoliDetail(c *gin.Context) {
@@ -24,6 +32,9 @@ func ArticoliDetail(c *gin.Context) {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
 	}
-	c.JSON(200, articolo)
+	c.JSON(http.StatusOK, ArticoloSerializer(articolo))
 }

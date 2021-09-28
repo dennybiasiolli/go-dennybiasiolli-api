@@ -12,8 +12,16 @@ import (
 func CitazioniList(c *gin.Context) {
 	db := common.GetDB()
 	var citazioni []Citazione
-	db.Where(&Citazione{IsApproved: true, IsPubblica: true}).Find(&citazioni)
-	c.JSON(200, citazioni)
+	var count int64
+	err := db.Where(&Citazione{IsApproved: true, IsPubblica: true}).Find(&citazioni).Order("-id").Count(&count).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"results": CitazioniSerializer(citazioni),
+		"count":   count,
+	})
 }
 
 func CitazioneDetail(c *gin.Context) {
@@ -24,6 +32,9 @@ func CitazioneDetail(c *gin.Context) {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
 	}
-	c.JSON(200, citazione)
+	c.JSON(http.StatusOK, CitazioneSerializer(citazione))
 }

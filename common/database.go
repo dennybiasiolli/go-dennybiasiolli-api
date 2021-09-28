@@ -16,7 +16,7 @@ func ConnectDb() {
 		PG_HOST, PG_PORT, PG_USER, PG_DATABASE, PG_SSLMODE,
 	)
 	if PG_PASSWORD != "" {
-		dsn = fmt.Sprint(dsn+" password=%v", PG_PASSWORD)
+		dsn = fmt.Sprintf(dsn+" password=%v", PG_PASSWORD)
 	}
 
 	var err error

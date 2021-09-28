@@ -6,3 +6,6 @@ func CitazioniAnonymousRegister(router *gin.RouterGroup) {
 	router.GET("/", CitazioniList)
 	router.GET("/:id", CitazioneDetail)
 }
+func CitazioneAnonymousRegister(router *gin.RouterGroup) {
+	router.GET("/", CitazioneRandomDetail)
+}

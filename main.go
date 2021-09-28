@@ -1,8 +1,15 @@
 package main
 
-import "github.com/dennybiasiolli/go-dennybiasiolli-api/common"
+import (
+	"math/rand"
+	"time"
+
+	"github.com/dennybiasiolli/go-dennybiasiolli-api/common"
+)
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
+
 	common.GetEnvVariables()
 
 	common.ConnectDb()

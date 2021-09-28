@@ -70,6 +70,7 @@ func setupRouter() *gin.Engine {
 
 	articoli.ArticoliAnonymousRegister(r.Group("/articoli"))
 	citazioni.CitazioniAnonymousRegister(r.Group("/citazioni"))
+	citazioni.CitazioneAnonymousRegister(r.Group("/citazione"))
 
 	return r
 }

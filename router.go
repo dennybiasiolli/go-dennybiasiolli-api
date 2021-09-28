@@ -3,6 +3,8 @@ package main
 import (
 	"net/http"
 
+	"github.com/dennybiasiolli/go-dennybiasiolli-api/articoli"
+	"github.com/dennybiasiolli/go-dennybiasiolli-api/citazioni"
 	"github.com/gin-gonic/gin"
 )
 
@@ -66,16 +68,8 @@ func setupRouter() *gin.Engine {
 		}
 	})
 
-	articoliRoute := r.Group("/articoli")
-	{
-		articoliRoute.GET("/", GetArticoli)
-		articoliRoute.GET("/:id", GetArticolo)
-	}
-	citazioniRoute := r.Group("/citazioni")
-	{
-		citazioniRoute.GET("/", GetCitazioni)
-		citazioniRoute.GET("/:id", GetCitazione)
-	}
+	articoli.ArticoliAnonymousRegister(r.Group("/articoli"))
+	citazioni.CitazioniAnonymousRegister(r.Group("/citazioni"))
 
 	return r
 }

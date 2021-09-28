@@ -1,4 +1,4 @@
-package main
+package common
 
 import (
 	"log"
@@ -16,7 +16,7 @@ var PG_PASSWORD string
 var PG_SSLMODE string
 var PG_DATABASE string
 
-func getEnvVariables() {
+func GetEnvVariables() {
 	/*
 		loading .env files in this order, if a variable is not set in `.env`,
 		it's read from `.env.default`

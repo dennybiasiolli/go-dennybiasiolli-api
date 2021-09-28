@@ -1,4 +1,4 @@
-package main
+package common
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 
 var db *gorm.DB
 
-func connectDb() {
+func ConnectDb() {
 	dsn := fmt.Sprintf(
 		"host=%v port=%v user=%v dbname=%v sslmode=%v",
 		PG_HOST, PG_PORT, PG_USER, PG_DATABASE, PG_SSLMODE,
@@ -24,4 +24,8 @@ func connectDb() {
 	if err != nil {
 		log.Fatal("Error connecting to the tatabase")
 	}
+}
+
+func GetDB() *gorm.DB {
+	return db
 }

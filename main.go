@@ -1,11 +1,13 @@
 package main
 
-func main() {
-	getEnvVariables()
+import "github.com/dennybiasiolli/go-dennybiasiolli-api/common"
 
-	connectDb()
+func main() {
+	common.GetEnvVariables()
+
+	common.ConnectDb()
 
 	r := setupRouter()
 	// Listen and Server in 0.0.0.0:8080
-	r.Run(HTTP_LISTEN)
+	r.Run(common.HTTP_LISTEN)
 }

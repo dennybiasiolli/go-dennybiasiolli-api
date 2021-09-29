@@ -61,6 +61,9 @@ func CitazioneCreate(c *gin.Context) {
 	}
 	db := common.GetDB()
 	db.Create(&citazione)
+	if common.SEND_EMAIL_AFTER_CITAZIONE_ADDED {
+		go SendMailOnQuoteAdded(citazione)
+	}
 	c.JSON(http.StatusOK, citazione)
 }
 

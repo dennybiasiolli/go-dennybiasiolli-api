@@ -16,6 +16,14 @@ var PG_PASSWORD string
 var PG_SSLMODE string
 var PG_DATABASE string
 
+var SEND_EMAIL_AFTER_CITAZIONE_ADDED bool
+var EMAIL_HOST string
+var EMAIL_PORT string
+var EMAIL_HOST_USER string
+var EMAIL_HOST_PASSWORD string
+var EMAIL_DEFAULT_FROM string
+var EMAIL_DEFAULT_TO string
+
 func GetEnvVariables() {
 	/*
 		loading .env files in this order, if a variable is not set in `.env`,
@@ -35,4 +43,12 @@ func GetEnvVariables() {
 	PG_PASSWORD = os.Getenv("PG_PASSWORD")
 	PG_SSLMODE = os.Getenv("PG_SSLMODE")
 	PG_DATABASE = os.Getenv("PG_DATABASE")
+
+	SEND_EMAIL_AFTER_CITAZIONE_ADDED = os.Getenv("SEND_EMAIL_AFTER_CITAZIONE_ADDED") == "1"
+	EMAIL_HOST = os.Getenv("EMAIL_HOST")
+	EMAIL_PORT = os.Getenv("EMAIL_PORT")
+	EMAIL_HOST_USER = os.Getenv("EMAIL_HOST_USER")
+	EMAIL_HOST_PASSWORD = os.Getenv("EMAIL_HOST_PASSWORD")
+	EMAIL_DEFAULT_FROM = os.Getenv("EMAIL_DEFAULT_FROM")
+	EMAIL_DEFAULT_TO = os.Getenv("EMAIL_DEFAULT_TO")
 }

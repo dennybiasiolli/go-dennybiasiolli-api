@@ -1,6 +1,7 @@
 package citazioni
 
 import (
+	"encoding/json"
 	"errors"
 	"math/rand"
 	"net/http"
@@ -38,6 +39,32 @@ func CitazioneDetail(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, CitazioneSerializer(citazione))
+}
+
+func CitazioneCreate(c *gin.Context) {
+	var input CreateCitazioneInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	userTrack, _ := json.MarshalIndent(gin.H{
+		"User-Agent":      c.Request.Header.Get("User-Agent"),
+		"x-forwarded-for": c.Request.Header.Get("x-forwarded-for"),
+		// "Remote-Addr": c.Request.Header.Get("Remote-Addr"),
+		"ClientIP": c.ClientIP(),
+	}, "", "  ")
+	userTrackStr := string(userTrack[:])
+	citazione := Citazione{
+		Frase:         input.Frase,
+		Autore:        input.Autore,
+		UserTrackJson: &userTrackStr,
+	}
+	db := common.GetDB()
+	db.Create(&citazione)
+	if common.SEND_EMAIL_AFTER_CITAZIONE_ADDED {
+		go SendMailOnQuoteAdded(citazione)
+	}
+	c.JSON(http.StatusOK, citazione)
 }
 
 func CitazioneRandomDetail(c *gin.Context) {

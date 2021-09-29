@@ -4,7 +4,6 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/dennybiasiolli/go-dennybiasiolli-api/citazioni"
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/common"
 )
 
@@ -14,7 +13,7 @@ func main() {
 	common.GetEnvVariables()
 
 	common.ConnectDb()
-	common.GetDB().AutoMigrate(&citazioni.Citazione{})
+	// common.GetDB().AutoMigrate(&citazioni.Citazione{})
 
 	r := setupRouter()
 	// Listen and Server in 0.0.0.0:8080

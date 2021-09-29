@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/common"
 	"github.com/gin-gonic/gin"
@@ -58,9 +59,15 @@ func CitazioneCreate(c *gin.Context) {
 		Frase:         input.Frase,
 		Autore:        input.Autore,
 		UserTrackJson: &userTrackStr,
+		CreatedDate:   time.Now(),
+		ModifiedDate:  time.Now(),
 	}
 	db := common.GetDB()
-	db.Create(&citazione)
+	err := db.Create(&citazione).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
 	if common.SEND_EMAIL_AFTER_CITAZIONE_ADDED {
 		go SendMailOnQuoteAdded(citazione)
 	}

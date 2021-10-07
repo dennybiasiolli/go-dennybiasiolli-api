@@ -1,17 +1,9 @@
 package budgest
 
 import (
-	"strings"
-
+	"github.com/dennybiasiolli/go-dennybiasiolli-api/auth"
 	"github.com/gin-gonic/gin"
 )
-
-func UserSerializer(user User) gin.H {
-	return gin.H{
-		"id":        user.ID,
-		"full_name": strings.TrimSpace(user.FirstName + " " + user.LastName),
-	}
-}
 
 func AmbitiSerializer(ambiti []Ambito) []gin.H {
 	response := []gin.H{}
@@ -23,9 +15,9 @@ func AmbitiSerializer(ambiti []Ambito) []gin.H {
 
 func AmbitoSerializer(ambito Ambito) gin.H {
 	return gin.H{
-		"id":              ambito.ID,
-		"owner_id":        ambito.OwnerId,
-		"owner":           UserSerializer(ambito.Owner),
+		"id": ambito.ID,
+		// "owner_id":        ambito.OwnerId,
+		"owner":           auth.UserSerializer(ambito.Owner),
 		"num":             ambito.Num,
 		"descrizione":     ambito.Descrizione,
 		"is_active":       ambito.IsActive,

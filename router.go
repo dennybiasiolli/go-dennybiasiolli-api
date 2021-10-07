@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/articoli"
+	"github.com/dennybiasiolli/go-dennybiasiolli-api/auth"
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/budgest"
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/citazioni"
 	"github.com/gin-gonic/gin"
@@ -74,7 +75,7 @@ func setupRouter() *gin.Engine {
 	articoli.ArticoliAnonymousRegister(r.Group("/articoli"))
 	citazioni.CitazioniAnonymousRegister(r.Group("/citazioni"))
 	citazioni.CitazioneAnonymousRegister(r.Group("/citazione"))
-	budgest.BudgestRegister(r.Group("/budgest", basicAuthHandler))
+	budgest.BudgestRegister(r.Group("/budgest", auth.DjangoBasicAuth))
 
 	return r
 }

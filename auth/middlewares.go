@@ -34,6 +34,7 @@ func DjangoBasicAuth(c *gin.Context) {
 
 	db := common.GetDB()
 	var user User = User{
+		IsActive: true,
 		Username: authParts[0],
 	}
 	err = db.Where(&user).First(&user).Error

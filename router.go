@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/articoli"
+	"github.com/dennybiasiolli/go-dennybiasiolli-api/auth"
+	"github.com/dennybiasiolli/go-dennybiasiolli-api/budgest"
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/citazioni"
 	"github.com/gin-gonic/gin"
 )
@@ -33,6 +35,11 @@ func setupRouter() *gin.Engine {
 		}
 	})
 
+	basicAuthHandler := gin.BasicAuth(gin.Accounts{
+		"foo":  "bar", // user:foo password:bar
+		"manu": "123", // user:manu password:123
+	})
+
 	// Authorized group (uses gin.BasicAuth() middleware)
 	// Same than:
 	// authorized := r.Group("/")
@@ -40,10 +47,7 @@ func setupRouter() *gin.Engine {
 	//	  "foo":  "bar",
 	//	  "manu": "123",
 	//}))
-	authorized := r.Group("/", gin.BasicAuth(gin.Accounts{
-		"foo":  "bar", // user:foo password:bar
-		"manu": "123", // user:manu password:123
-	}))
+	authorized := r.Group("/", basicAuthHandler)
 
 	/* example curl for /admin with basicauth header
 	   Zm9vOmJhcg== is base64("foo:bar")
@@ -71,6 +75,7 @@ func setupRouter() *gin.Engine {
 	articoli.ArticoliAnonymousRegister(r.Group("/articoli"))
 	citazioni.CitazioniAnonymousRegister(r.Group("/citazioni"))
 	citazioni.CitazioneAnonymousRegister(r.Group("/citazione"))
+	budgest.BudgestRegister(r.Group("/budgest", auth.DjangoBasicAuth))
 
 	return r
 }

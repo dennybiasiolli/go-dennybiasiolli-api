@@ -75,7 +75,7 @@ func setupRouter() *gin.Engine {
 	articoli.ArticoliAnonymousRegister(r.Group("/articoli"))
 	citazioni.CitazioniAnonymousRegister(r.Group("/citazioni"))
 	citazioni.CitazioneAnonymousRegister(r.Group("/citazione"))
-	budgest.BudgestRegister(r.Group("/budgest", auth.DjangoBasicAuth))
+	budgest.BudgestRegister(r.Group("/budgest", auth.DjangoJwtAuth))
 
 	return r
 }

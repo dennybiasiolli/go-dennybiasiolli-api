@@ -24,6 +24,8 @@ var EMAIL_HOST_PASSWORD string
 var EMAIL_DEFAULT_FROM string
 var EMAIL_DEFAULT_TO string
 
+var JWT_HMAC_SAMPLE_SECRET string
+
 func GetEnvVariables() {
 	/*
 		loading .env files in this order, if a variable is not set in `.env`,
@@ -51,4 +53,6 @@ func GetEnvVariables() {
 	EMAIL_HOST_PASSWORD = os.Getenv("EMAIL_HOST_PASSWORD")
 	EMAIL_DEFAULT_FROM = os.Getenv("EMAIL_DEFAULT_FROM")
 	EMAIL_DEFAULT_TO = os.Getenv("EMAIL_DEFAULT_TO")
+
+	JWT_HMAC_SAMPLE_SECRET = os.Getenv("JWT_HMAC_SAMPLE_SECRET")
 }

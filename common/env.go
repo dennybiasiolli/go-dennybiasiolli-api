@@ -3,6 +3,7 @@ package common
 import (
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -25,6 +26,7 @@ var EMAIL_DEFAULT_FROM string
 var EMAIL_DEFAULT_TO string
 
 var JWT_HMAC_SAMPLE_SECRET string
+var JWT_ACCESS_TOKEN_LIFETIME_SECONDS int = 3600
 
 func GetEnvVariables() {
 	/*
@@ -55,4 +57,7 @@ func GetEnvVariables() {
 	EMAIL_DEFAULT_TO = os.Getenv("EMAIL_DEFAULT_TO")
 
 	JWT_HMAC_SAMPLE_SECRET = os.Getenv("JWT_HMAC_SAMPLE_SECRET")
+	if val, err := strconv.Atoi(os.Getenv("JWT_ACCESS_TOKEN_LIFETIME_SECONDS")); err != nil {
+		JWT_ACCESS_TOKEN_LIFETIME_SECONDS = val
+	}
 }

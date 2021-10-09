@@ -18,8 +18,28 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/dennybiasiolli/go-dennybiasiolli-api/common"
 	"golang.org/x/crypto/pbkdf2"
 )
+
+func LoginDjangoUser(username string, password string) (user *User, err error) {
+	db := common.GetDB()
+	u := User{
+		IsActive: true,
+		Username: username,
+	}
+	err = db.Where(&u).First(&u).Error
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := CheckPassword(password, u.Password)
+	if !res || err != nil {
+		return nil, errors.New("Incorrect password")
+	}
+
+	return &u, err
+}
 
 // CheckPassword checks if given password is matching given hash
 func CheckPassword(password, encoded string) (bool, error) {

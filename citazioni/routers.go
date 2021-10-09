@@ -4,7 +4,7 @@ import "github.com/gin-gonic/gin"
 
 func CitazioniAnonymousRegister(router *gin.RouterGroup) {
 	router.GET("/", CitazioniList)
-	router.GET("/:id", CitazioneDetail)
+	router.GET("/:id/", CitazioneDetail)
 	router.POST("/", CitazioneCreate)
 }
 func CitazioneAnonymousRegister(router *gin.RouterGroup) {

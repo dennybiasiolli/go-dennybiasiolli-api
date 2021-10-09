@@ -2,6 +2,7 @@ package auth
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -11,23 +12,30 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func DjangoBasicAuth(c *gin.Context) {
+func getAuthorizationHeader(c *gin.Context, auth_type string) (string, error) {
 	authorizationHeader := c.Request.Header.Get("Authorization")
 	authParts := strings.SplitN(authorizationHeader, " ", 2)
 	if len(authParts) != 2 {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Failed to parse authentication string"})
-		return
+		return "", errors.New("Failed to parse authentication string")
 	}
-	if authParts[0] != "Basic" {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": fmt.Sprintf("Authorization scheme is %v, not Basic", authParts[0])})
-		return
+	if authParts[0] != auth_type {
+		return "", errors.New(fmt.Sprintf("Authorization scheme is %v, not %v", authParts[0], auth_type))
 	}
-	sDec, err := base64.StdEncoding.DecodeString(authParts[1])
+	return authParts[1], nil
+}
+
+func DjangoBasicAuth(c *gin.Context) {
+	auth_token, err := getAuthorizationHeader(c, "Basic")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+	}
+
+	sDec, err := base64.StdEncoding.DecodeString(auth_token)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Failed to parse base64 basic credentials"})
 		return
 	}
-	authParts = strings.SplitN(string(sDec), ":", 2)
+	authParts := strings.SplitN(string(sDec), ":", 2)
 	if len(authParts) != 2 {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Failed to parse basic credentials"})
 		return
@@ -43,19 +51,13 @@ func DjangoBasicAuth(c *gin.Context) {
 }
 
 func DjangoJwtAuth(c *gin.Context) {
-	authorizationHeader := c.Request.Header.Get("Authorization")
-	authParts := strings.SplitN(authorizationHeader, " ", 2)
-	if len(authParts) != 2 {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Failed to parse authentication string"})
-		return
-	}
-	if authParts[0] != "Bearer" {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": fmt.Sprintf("Authorization scheme is %v, not Bearer", authParts[0])})
-		return
+	auth_token, err := getAuthorizationHeader(c, "Bearer")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 	}
 
 	// check token validity
-	token, err := jwt.Parse(authParts[1], func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(auth_token, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])

@@ -33,19 +33,8 @@ func DjangoBasicAuth(c *gin.Context) {
 		return
 	}
 
-	db := common.GetDB()
-	var user User = User{
-		IsActive: true,
-		Username: authParts[0],
-	}
-	err = db.Where(&user).First(&user).Error
+	user, err := LoginDjangoUser(authParts[0], authParts[1])
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
-	}
-
-	res, err := CheckPassword(authParts[1], user.Password)
-	if !res || err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}

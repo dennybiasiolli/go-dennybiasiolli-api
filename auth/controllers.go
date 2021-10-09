@@ -17,18 +17,8 @@ func TokenObtain(c *gin.Context) {
 		return
 	}
 
-	db := common.GetDB()
-	var user User = User{
-		IsActive: true,
-		Username: input.Username,
-	}
-	if err := db.Where(&user).First(&user).Error; err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
-	}
-
-	res, err := CheckPassword(input.Password, user.Password)
-	if !res || err != nil {
+	user, err := LoginDjangoUser(input.Username, input.Password)
+	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}

@@ -63,13 +63,16 @@ func setupRouter() *gin.Engine {
 
 		// Parse JSON
 		var json struct {
-			Value string `json:"value" binding:"required"`
+			Value  string `json:"value" binding:"required"`
+			Value2 int    `json:"value2" binding:"required,number"`
 		}
 
-		if c.Bind(&json) == nil {
-			db[user] = json.Value
-			c.JSON(http.StatusOK, gin.H{"status": "ok"})
+		if err := c.Bind(&json); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
 		}
+		db[user] = json.Value
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
 	articoli.ArticoliAnonymousRegister(r.Group("/articoli"))

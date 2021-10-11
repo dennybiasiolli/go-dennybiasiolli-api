@@ -4,55 +4,56 @@ import (
 	"encoding/json"
 	"errors"
 	"math/rand"
-	"net/http"
 	"time"
 
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/common"
-	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
-func CitazioniList(c *gin.Context) {
+func CitazioniList(c *fiber.Ctx) error {
 	db := common.GetDB()
 	var citazioni []Citazione
 	var count int64
 	err := db.Where(&Citazione{IsApproved: true, IsPubblica: true}).Find(&citazioni).Order("-id").Count(&count).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		return
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": err.Error()})
 	}
-	c.JSON(http.StatusOK, gin.H{
+	return c.JSON(fiber.Map{
 		"results": CitazioniSerializer(citazioni),
 		"count":   count,
 	})
 }
 
-func CitazioneDetail(c *gin.Context) {
+func CitazioneDetail(c *fiber.Ctx) error {
 	db := common.GetDB()
 	var citazione Citazione
-	id := c.Params.ByName("id")
+	id := c.Params("id")
 	err := db.Where(&Citazione{IsApproved: true, IsPubblica: true}).First(&citazione, id).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
-		return
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": err.Error()})
 	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		return
+		c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": err.Error()})
 	}
-	c.JSON(http.StatusOK, CitazioneSerializer(citazione))
+	return c.JSON(CitazioneSerializer(citazione))
 }
 
-func CitazioneCreate(c *gin.Context) {
-	var input CreateCitazioneInput
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+func CitazioneCreate(c *fiber.Ctx) error {
+	input := new(CreateCitazioneInput)
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
-	userTrack, _ := json.MarshalIndent(gin.H{
-		"User-Agent":      c.Request.Header.Get("User-Agent"),
-		"x-forwarded-for": c.Request.Header.Get("x-forwarded-for"),
+	if err := validator.New().Struct(input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	userTrack, _ := json.MarshalIndent(fiber.Map{
+		"User-Agent":      c.Request().Header.UserAgent(),
+		"x-forwarded-for": c.Get(fiber.HeaderXForwardedFor),
 		// "Remote-Addr": c.Request.Header.Get("Remote-Addr"),
-		"ClientIP": c.ClientIP(),
+		"ClientIP": c.IP(),
 	}, "", "  ")
 	userTrackStr := string(userTrack[:])
 	citazione := Citazione{
@@ -65,33 +66,29 @@ func CitazioneCreate(c *gin.Context) {
 	db := common.GetDB()
 	err := db.Create(&citazione).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		return
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": err.Error()})
 	}
 	if common.SEND_EMAIL_AFTER_CITAZIONE_ADDED {
 		go SendMailOnQuoteAdded(citazione)
 	}
-	c.JSON(http.StatusOK, citazione)
+	return c.JSON(citazione)
 }
 
-func CitazioneRandomDetail(c *gin.Context) {
+func CitazioneRandomDetail(c *fiber.Ctx) error {
 	db := common.GetDB()
 	var count int64
 	var citazione Citazione
-	search := c.DefaultQuery("search", "")
+	search := c.Query("search", "")
 	qs := db.Model(&Citazione{}).Where(&Citazione{IsApproved: true, IsPubblica: true}).Where("frase ILIKE ? OR autore ILIKE ?", "%"+search+"%", "%"+search+"%").Count(&count)
 	err := qs.Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
-		return
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": err.Error()})
 	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		return
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": err.Error()})
 	} else if count == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"message": "no quotes found"})
-		return
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "no quotes found"})
 	}
 	i := rand.Int63n(count)
 	qs.Limit(1).Offset(int(i)).First(&citazione)
-	c.JSON(http.StatusOK, CitazioneSerializer(citazione))
+	return c.JSON(CitazioneSerializer(citazione))
 }

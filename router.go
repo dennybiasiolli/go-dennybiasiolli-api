@@ -1,83 +1,85 @@
 package main
 
 import (
-	"net/http"
+	"fmt"
 
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/articoli"
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/auth"
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/budgest"
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/citazioni"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/basicauth"
 )
 
-func setupRouter() *gin.Engine {
+func setupFiberRoutes(app *fiber.App) {
 	var db = make(map[string]string)
 
-	// Disable Console Color
-	// gin.DisableConsoleColor()
-	r := gin.Default()
-
-	// Ping test
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
+	app.Get("/ping", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
 			"message": "pong",
 		})
 	})
 
-	// Get user value
-	r.GET("/user/:name", func(c *gin.Context) {
-		user := c.Params.ByName("name")
-		value, ok := db[user]
-		if ok {
-			c.JSON(http.StatusOK, gin.H{"user": user, "value": value})
-		} else {
-			c.JSON(http.StatusOK, gin.H{"user": user, "status": "no value"})
-		}
+	basicAuthHandler := basicauth.New(basicauth.Config{
+		Users: map[string]string{
+			"foo":  "bar", // user:foo password:bar
+			"manu": "123", // user:manu password:123
+		},
 	})
 
-	basicAuthHandler := gin.BasicAuth(gin.Accounts{
-		"foo":  "bar", // user:foo password:bar
-		"manu": "123", // user:manu password:123
-	})
+	// // Authorized group (uses basicauth middleware)
+	// authorized := app.Group("/", basicAuthHandler)
 
-	// Authorized group (uses gin.BasicAuth() middleware)
-	// Same than:
-	// authorized := r.Group("/")
-	// authorized.Use(gin.BasicAuth(gin.Credentials{
-	//	  "foo":  "bar",
-	//	  "manu": "123",
-	//}))
-	authorized := r.Group("/", basicAuthHandler)
-
-	/* example curl for /admin with basicauth header
-	   Zm9vOmJhcg== is base64("foo:bar")
-
-		curl -X POST \
-	  	http://localhost:8080/admin \
-	  	-H 'authorization: Basic Zm9vOmJhcg==' \
-	  	-H 'content-type: application/json' \
-	  	-d '{"value":"bar"}'
-	*/
-	authorized.POST("admin", func(c *gin.Context) {
-		user := c.MustGet(gin.AuthUserKey).(string)
-
-		// Parse JSON
-		var json struct {
-			Value  string `json:"value" binding:"required"`
-			Value2 int    `json:"value2" binding:"required,number"`
+	app.Post("/admin", basicAuthHandler, func(c *fiber.Ctx) error {
+		type BodyStruct struct {
+			Value  string `json:"value" xml:"value" form:"value" validate:"required,min=3,max=32"`
+			Value2 int    `json:"value2" xml:"value2" form:"value2" validate:"required,number"`
 		}
 
-		if err := c.Bind(&json); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+		jsonBody := new(BodyStruct)
+		if err := c.BodyParser(&jsonBody); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": err.Error(),
+			})
 		}
-		db[user] = json.Value
-		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+		err := validator.New().Struct(jsonBody)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+			// validation
+			// response := []fiber.Map{}
+			// for _, err := range err.(validator.ValidationErrors) {
+			// 	response = append(response, fiber.Map{
+			// 		"Tag":             err.Tag(),
+			// 		"ActualTag":       err.ActualTag(),
+			// 		"Namespace":       err.Namespace(),
+			// 		"StructNamespace": err.StructNamespace(),
+			// 		"Field":           err.Field(),
+			// 		"StructField":     err.StructField(),
+			// 		"Value":           err.Value(),
+			// 		"Param":           err.Param(),
+			// 		"Error":           err.Error(),
+			// 	})
+			// }
+			// return c.Status(fiber.StatusBadRequest).JSON(response)
+		}
+
+		username := fmt.Sprintf("%v", c.Locals("username"))
+		db[username] = jsonBody.Value
+		return c.JSON(fiber.Map{"status": "ok"})
 	})
 
-	articoli.ArticoliAnonymousRegister(r.Group("/articoli"))
-	citazioni.CitazioniAnonymousRegister(r.Group("/citazioni"))
-	citazioni.CitazioneAnonymousRegister(r.Group("/citazione"))
+	articoli.ArticoliAnonymousRegister(app.Group("/articoli"))
+	citazioni.CitazioniAnonymousRegister(app.Group("/citazioni"))
+	citazioni.CitazioneAnonymousRegister(app.Group("/citazione"))
+}
+
+func setupRouter() *gin.Engine {
+	r := gin.Default()
+
 	budgest.BudgestRegister(r.Group("/budgest", auth.DjangoJwtAuth))
 	auth.JwtTokenRegister(r.Group("/token"))
 

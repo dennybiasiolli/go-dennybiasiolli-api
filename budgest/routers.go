@@ -1,8 +1,8 @@
 package budgest
 
-import "github.com/gin-gonic/gin"
+import "github.com/gofiber/fiber/v2"
 
-func BudgestRegister(router *gin.RouterGroup) {
-	router.GET("/ambiti/", AmbitiList)
-	router.GET("/ambiti/:id/", AmbitiDetail)
+func BudgestRegister(router fiber.Router) {
+	router.Get("/ambiti/", AmbitiList)
+	router.Get("/ambiti/:id/", AmbitiDetail)
 }

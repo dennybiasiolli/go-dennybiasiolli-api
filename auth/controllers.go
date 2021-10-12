@@ -37,7 +37,7 @@ func TokenObtain(c *fiber.Ctx) error {
 			IsStaff:  user.IsStaff,
 		},
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Unix() + int64(common.JWT_ACCESS_TOKEN_LIFETIME_SECONDS),
+			ExpiresAt: time.Now().Add(time.Second * time.Duration(common.JWT_ACCESS_TOKEN_LIFETIME_SECONDS)).Unix(),
 		},
 	}
 

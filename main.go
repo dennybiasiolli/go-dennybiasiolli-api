@@ -26,8 +26,4 @@ func main() {
 	})
 
 	log.Fatal(app.Listen(common.HTTP_LISTEN))
-
-	r := setupRouter()
-	// Listen and Server in 0.0.0.0:8080
-	r.Run(common.HTTP_LISTEN)
 }

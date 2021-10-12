@@ -7,7 +7,6 @@ import (
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/auth"
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/budgest"
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/citazioni"
-	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
@@ -76,12 +75,5 @@ func setupFiberRoutes(app *fiber.App) {
 	citazioni.CitazioniAnonymousRegister(app.Group("/citazioni"))
 	citazioni.CitazioneAnonymousRegister(app.Group("/citazione"))
 	auth.JwtTokenRegister(app.Group("/token"))
-}
-
-func setupRouter() *gin.Engine {
-	r := gin.Default()
-
-	budgest.BudgestRegister(r.Group("/budgest", auth.DjangoJwtAuth))
-
-	return r
+	budgest.BudgestRegister(app.Group("/budgest").Use(auth.GetDjangoJwtAuthMiddleware()))
 }

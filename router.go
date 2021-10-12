@@ -39,7 +39,7 @@ func setupFiberRoutes(app *fiber.App) {
 		}
 
 		jsonBody := new(BodyStruct)
-		if err := c.BodyParser(&jsonBody); err != nil {
+		if err := c.BodyParser(jsonBody); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": err.Error(),
 			})

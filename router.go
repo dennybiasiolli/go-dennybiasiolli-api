@@ -75,13 +75,13 @@ func setupFiberRoutes(app *fiber.App) {
 	articoli.ArticoliAnonymousRegister(app.Group("/articoli"))
 	citazioni.CitazioniAnonymousRegister(app.Group("/citazioni"))
 	citazioni.CitazioneAnonymousRegister(app.Group("/citazione"))
+	auth.JwtTokenRegister(app.Group("/token"))
 }
 
 func setupRouter() *gin.Engine {
 	r := gin.Default()
 
 	budgest.BudgestRegister(r.Group("/budgest", auth.DjangoJwtAuth))
-	auth.JwtTokenRegister(r.Group("/token"))
 
 	return r
 }

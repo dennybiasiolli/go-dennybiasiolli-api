@@ -9,7 +9,8 @@ import (
 
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/common"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
+	jwtware "github.com/gofiber/jwt/v3"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 func getAuthorizationHeader(c *gin.Context, auth_type string) (string, error) {
@@ -84,3 +85,7 @@ func DjangoJwtAuth(c *gin.Context) {
 
 	c.Set("user", user)
 }
+
+var JwtMiddleware = jwtware.New(jwtware.Config{
+	SigningKey: []byte(common.JWT_HMAC_SAMPLE_SECRET),
+})

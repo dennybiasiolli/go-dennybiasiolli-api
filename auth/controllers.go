@@ -36,8 +36,8 @@ func TokenObtain(c *fiber.Ctx) error {
 			FullName: strings.TrimSpace(user.FirstName + " " + user.LastName),
 			IsStaff:  user.IsStaff,
 		},
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Second * time.Duration(common.JWT_ACCESS_TOKEN_LIFETIME_SECONDS)).Unix(),
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(common.JWT_ACCESS_TOKEN_LIFETIME_SECONDS))),
 		},
 	}
 

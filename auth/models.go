@@ -34,5 +34,5 @@ type JwtCustomClaims struct {
 	TokenType string      `json:"token_type"`
 	UserId    int         `json:"user_id"`
 	UserInfo  JwtUserInfo `json:"user_info"`
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }

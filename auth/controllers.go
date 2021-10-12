@@ -28,15 +28,15 @@ func TokenObtain(c *fiber.Ctx) error {
 
 	// Set claims
 	claims := JwtCustomClaims{
-		"access",
-		user.ID,
-		JwtUserInfo{
+		TokenType: "access",
+		UserId:    user.ID,
+		UserInfo: JwtUserInfo{
 			Username: user.Username,
 			Email:    user.Email,
 			FullName: strings.TrimSpace(user.FirstName + " " + user.LastName),
 			IsStaff:  user.IsStaff,
 		},
-		jwt.StandardClaims{
+		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Second * time.Duration(common.JWT_ACCESS_TOKEN_LIFETIME_SECONDS)).Unix(),
 		},
 	}

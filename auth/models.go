@@ -1,6 +1,6 @@
 package auth
 
-import "github.com/golang-jwt/jwt"
+import "github.com/golang-jwt/jwt/v4"
 
 type User struct {
 	ID          int    `gorm:"AUTO_INCREMENT; primaryKey"`
@@ -20,8 +20,8 @@ func (User) TableName() string {
 }
 
 type LoginInput struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
 
 type JwtUserInfo struct {

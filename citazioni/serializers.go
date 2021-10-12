@@ -1,11 +1,9 @@
 package citazioni
 
-import (
-	"github.com/gin-gonic/gin"
-)
+import "github.com/gofiber/fiber/v2"
 
-func CitazioniSerializer(citazioni []Citazione) []gin.H {
-	response := []gin.H{}
+func CitazioniSerializer(citazioni []Citazione) []fiber.Map {
+	response := []fiber.Map{}
 	for _, citazione := range citazioni {
 		fraseLen := len(citazione.Frase)
 		appendStr := ""
@@ -13,7 +11,7 @@ func CitazioniSerializer(citazioni []Citazione) []gin.H {
 			fraseLen = 100
 			appendStr = "..."
 		}
-		response = append(response, gin.H{
+		response = append(response, fiber.Map{
 			"id":              citazione.ID,
 			"frase":           citazione.Frase[:fraseLen] + appendStr,
 			"autore":          citazione.Autore,
@@ -24,8 +22,8 @@ func CitazioniSerializer(citazioni []Citazione) []gin.H {
 	return response
 }
 
-func CitazioneSerializer(citazione Citazione) gin.H {
-	return gin.H{
+func CitazioneSerializer(citazione Citazione) fiber.Map {
+	return fiber.Map{
 		"id":              citazione.ID,
 		"frase":           citazione.Frase,
 		"autore":          citazione.Autore,

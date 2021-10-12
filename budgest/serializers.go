@@ -2,19 +2,19 @@ package budgest
 
 import (
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/auth"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 )
 
-func AmbitiSerializer(ambiti []Ambito) []gin.H {
-	response := []gin.H{}
+func AmbitiSerializer(ambiti []Ambito) []fiber.Map {
+	response := []fiber.Map{}
 	for _, ambito := range ambiti {
 		response = append(response, AmbitoSerializer(ambito))
 	}
 	return response
 }
 
-func AmbitoSerializer(ambito Ambito) gin.H {
-	return gin.H{
+func AmbitoSerializer(ambito Ambito) fiber.Map {
+	return fiber.Map{
 		"id": ambito.ID,
 		// "owner_id":        ambito.OwnerId,
 		"owner":           auth.UserSerializer(ambito.Owner),

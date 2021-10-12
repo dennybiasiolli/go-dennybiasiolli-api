@@ -1,8 +1,8 @@
 package articoli
 
-import "github.com/gin-gonic/gin"
+import "github.com/gofiber/fiber/v2"
 
-func ArticoliAnonymousRegister(router *gin.RouterGroup) {
-	router.GET("/", ArticoliList)
-	router.GET("/:id/", ArticoliDetail)
+func ArticoliAnonymousRegister(router fiber.Router) {
+	router.Get("/", ArticoliList)
+	router.Get("/:id/", ArticoliDetail)
 }

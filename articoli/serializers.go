@@ -1,13 +1,11 @@
 package articoli
 
-import (
-	"github.com/gin-gonic/gin"
-)
+import "github.com/gofiber/fiber/v2"
 
-func ArticoliSerializer(articoli []Articolo) []gin.H {
-	response := []gin.H{}
+func ArticoliSerializer(articoli []Articolo) []fiber.Map {
+	response := []fiber.Map{}
 	for _, articolo := range articoli {
-		response = append(response, gin.H{
+		response = append(response, fiber.Map{
 			"id":                 articolo.ID,
 			"data_pubblicazione": articolo.DataPubblicazione,
 			"titolo_it":          articolo.TitoloIt,
@@ -18,8 +16,8 @@ func ArticoliSerializer(articoli []Articolo) []gin.H {
 	return response
 }
 
-func ArticoloSerializer(articolo Articolo) gin.H {
-	return gin.H{
+func ArticoloSerializer(articolo Articolo) fiber.Map {
+	return fiber.Map{
 		"id":                 articolo.ID,
 		"data_pubblicazione": articolo.DataPubblicazione,
 		"titolo_it":          articolo.TitoloIt,

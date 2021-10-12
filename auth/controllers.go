@@ -1,32 +1,32 @@
 package auth
 
 import (
-	"net/http"
 	"strings"
 	"time"
 
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/common"
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
+	"github.com/go-playground/validator/v10"
+	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v4"
 )
 
-func TokenObtain(c *gin.Context) {
-	var input LoginInput
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+func TokenObtain(c *fiber.Ctx) error {
+	input := new(LoginInput)
+	if err := c.BodyParser(input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+	if err := validator.New().Struct(input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
 	}
 
 	user, err := LoginDjangoUser(input.Username, input.Password)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
 	}
 
-	// JWT section
-	mySigningKey := []byte(common.JWT_HMAC_SAMPLE_SECRET)
-
-	// Create the Claims
+	// Set claims
 	claims := JwtCustomClaims{
 		"access",
 		user.ID,
@@ -37,14 +37,18 @@ func TokenObtain(c *gin.Context) {
 			IsStaff:  user.IsStaff,
 		},
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Unix() + int64(common.JWT_ACCESS_TOKEN_LIFETIME_SECONDS),
+			ExpiresAt: time.Now().Add(time.Second * time.Duration(common.JWT_ACCESS_TOKEN_LIFETIME_SECONDS)).Unix(),
 		},
 	}
 
+	// Create token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	ss, err := token.SignedString(mySigningKey)
 
-	c.JSON(http.StatusOK, gin.H{
-		"access": ss,
-	})
+	// Generate encoded token and send it as response.
+	t, err := token.SignedString([]byte(common.JWT_HMAC_SAMPLE_SECRET))
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return c.JSON(fiber.Map{"access": t})
 }

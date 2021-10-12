@@ -1,12 +1,14 @@
 package citazioni
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gofiber/fiber/v2"
+)
 
-func CitazioniAnonymousRegister(router *gin.RouterGroup) {
-	router.GET("/", CitazioniList)
-	router.GET("/:id/", CitazioneDetail)
-	router.POST("/", CitazioneCreate)
+func CitazioniAnonymousRegister(router fiber.Router) {
+	router.Get("/", CitazioniList)
+	router.Get("/:id/", CitazioneDetail)
+	router.Post("/", CitazioneCreate)
 }
-func CitazioneAnonymousRegister(router *gin.RouterGroup) {
-	router.GET("/", CitazioneRandomDetail)
+func CitazioneAnonymousRegister(router fiber.Router) {
+	router.Get("/", CitazioneRandomDetail)
 }

@@ -2,41 +2,37 @@ package budgest
 
 import (
 	"errors"
-	"net/http"
 
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/common"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
-func AmbitiList(c *gin.Context) {
+func AmbitiList(c *fiber.Ctx) error {
 	db := common.GetDB()
 	var ambiti []Ambito
 	var count int64
 	// var ambitoFilter = Ambito{IsActive: true}
 	err := db.Where("budgest_ambito.is_active = true").Joins("Owner").Order("budgest_ambito.num").Find(&ambiti).Count(&count).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		return
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": err.Error()})
 	}
-	c.JSON(http.StatusOK, gin.H{
+	return c.JSON(fiber.Map{
 		"results": AmbitiSerializer(ambiti),
 		"count":   count,
 	})
 }
 
-func AmbitiDetail(c *gin.Context) {
+func AmbitiDetail(c *fiber.Ctx) error {
 	db := common.GetDB()
 	var ambito Ambito
-	id := c.Params.ByName("id")
+	id := c.Params("id")
 	// var ambitoFilter = Ambito{IsActive: true}
 	err := db.Where("budgest_ambito.is_active = true").Joins("Owner").First(&ambito, id).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
-		return
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": err.Error()})
 	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		return
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": err.Error()})
 	}
-	c.JSON(http.StatusOK, AmbitoSerializer(ambito))
+	return c.JSON(AmbitoSerializer(ambito))
 }

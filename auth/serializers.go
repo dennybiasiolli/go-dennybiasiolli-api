@@ -3,11 +3,11 @@ package auth
 import (
 	"strings"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 )
 
-func UserSerializer(user User) gin.H {
-	return gin.H{
+func UserSerializer(user User) fiber.Map {
+	return fiber.Map{
 		"id":        user.ID,
 		"full_name": strings.TrimSpace(user.FirstName + " " + user.LastName),
 	}

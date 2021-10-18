@@ -41,7 +41,6 @@ jobs:
     - name: Test
       run: go test -v ./...
       env:
-        PG_HOST: localhost
         PG_USER: postgres
         PG_PASSWORD: postgres
         PG_DATABASE: testdb

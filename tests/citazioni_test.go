@@ -9,7 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func Test_citazionie(t *testing.T) {
+func Test_citazioni(t *testing.T) {
 	app, db := SetupTests(func(app *fiber.App) {
 		citazioni.CitazioniAnonymousRegister(app.Group("/citazioni"))
 		citazioni.CitazioneAnonymousRegister(app.Group("/citazione"))

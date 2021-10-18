@@ -22,3 +22,8 @@ go list -m -u gorm.io/gorm
 ```sh
 go get -u gorm.io/gorm
 ```
+
+
+## Testing
+
+`go test -v ./tests`

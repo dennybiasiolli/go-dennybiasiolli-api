@@ -21,6 +21,6 @@ func (Citazione) TableName() string {
 }
 
 type CreateCitazioneInput struct {
-	Frase  string `json:"frase" validate:"required"`
-	Autore string `json:"autore" validate:"required"`
+	Frase  string `json:"frase" xml:"frase" form:"frase" validate:"required"`
+	Autore string `json:"autore" xml:"autore" form:"autore" validate:"required"`
 }

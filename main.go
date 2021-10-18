@@ -12,7 +12,7 @@ import (
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	common.GetEnvVariables()
+	common.GetEnvVariables(".env", ".env.default")
 
 	common.ConnectDb()
 	// common.GetDB().AutoMigrate(&citazioni.Citazione{})

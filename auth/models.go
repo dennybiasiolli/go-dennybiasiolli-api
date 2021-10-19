@@ -36,3 +36,14 @@ type JwtCustomClaims struct {
 	UserInfo  JwtUserInfo `json:"user_info"`
 	jwt.RegisteredClaims
 }
+
+type GoogleUserInfo struct {
+	ID            string `json:"id"`
+	Email         string `json:"email"`
+	FamilyName    string `json:"family_name"`
+	GivenName     string `json:"given_name"`
+	Name          string `json:"name"`
+	Locale        string `json:"locale"`
+	Picture       string `json:"picture"`
+	VerifiedEmail bool   `json:"verified_email"`
+}

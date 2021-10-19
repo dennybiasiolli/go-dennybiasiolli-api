@@ -75,5 +75,6 @@ func setupFiberRoutes(app *fiber.App) {
 	citazioni.CitazioniAnonymousRegister(app.Group("/citazioni"))
 	citazioni.CitazioneAnonymousRegister(app.Group("/citazione"))
 	auth.JwtTokenRegister(app.Group("/token"))
+	auth.Oauth2GoogleRegister(app.Group("/oauth2"))
 	budgest.BudgestRegister(app.Group("/budgest").Use(auth.GetDjangoJwtAuthMiddleware()))
 }

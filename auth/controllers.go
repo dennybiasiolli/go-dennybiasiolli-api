@@ -114,5 +114,42 @@ func GoogleOauth2(c *fiber.Ctx) error {
 	}
 	var userInfo GoogleUserInfo
 	json.Unmarshal(contents, &userInfo)
-	return c.JSON(userInfo)
+
+	// check existing user
+	db := common.GetDB()
+	var user User = User{
+		Email:    userInfo.Email,
+		IsActive: true,
+	}
+	err = db.Where(&user).First(&user).Error
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	// Set claims
+	claims := JwtCustomClaims{
+		TokenType: "access",
+		UserId:    user.ID,
+		UserInfo: JwtUserInfo{
+			Username: user.Username,
+			Email:    user.Email,
+			FullName: strings.TrimSpace(user.FirstName + " " + user.LastName),
+			IsStaff:  user.IsStaff,
+		},
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(common.JWT_ACCESS_TOKEN_LIFETIME_SECONDS))),
+			ID:        fmt.Sprintf("%v", time.Now().UnixMilli()),
+		},
+	}
+
+	// Create token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	// Generate encoded token and send it as response.
+	t, err := token.SignedString([]byte(common.JWT_HMAC_SAMPLE_SECRET))
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return c.JSON(fiber.Map{"access": t})
 }

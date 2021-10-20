@@ -20,6 +20,8 @@ import (
 
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/common"
 	"golang.org/x/crypto/pbkdf2"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 func LoginDjangoUser(username string, password string) (user *User, err error) {
@@ -107,4 +109,17 @@ func checkHash(password, encoded string, h func() hash.Hash) (bool, error) {
 		return false, err
 	}
 	return subtle.ConstantTimeCompare(k, hf.Sum(nil)) == 1, nil
+}
+
+func getGoogleOauth2Config() *oauth2.Config {
+	return &oauth2.Config{
+		RedirectURL:  common.GOOGLE_OAUTH2_DEFAULT_REDIRECT_URL,
+		ClientID:     common.GOOGLE_OAUTH2_CLIENT_ID,
+		ClientSecret: common.GOOGLE_OAUTH2_CLIENT_SECRET,
+		Scopes: []string{
+			"https://www.googleapis.com/auth/userinfo.email",
+			"https://www.googleapis.com/auth/userinfo.profile",
+		},
+		Endpoint: google.Endpoint,
+	}
 }

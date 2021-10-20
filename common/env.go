@@ -28,6 +28,10 @@ var EMAIL_DEFAULT_TO string
 var JWT_HMAC_SAMPLE_SECRET string
 var JWT_ACCESS_TOKEN_LIFETIME_SECONDS int = 3600
 
+var GOOGLE_OAUTH2_CLIENT_ID string
+var GOOGLE_OAUTH2_CLIENT_SECRET string
+var GOOGLE_OAUTH2_DEFAULT_REDIRECT_URL string
+
 func GetEnvVariables(mainFile string, fallbackFile string) {
 	/*
 		loading .env files in this order, if a variable is not set in `mainFile`,
@@ -60,4 +64,8 @@ func GetEnvVariables(mainFile string, fallbackFile string) {
 	if val, err := strconv.Atoi(os.Getenv("JWT_ACCESS_TOKEN_LIFETIME_SECONDS")); err != nil {
 		JWT_ACCESS_TOKEN_LIFETIME_SECONDS = val
 	}
+
+	GOOGLE_OAUTH2_CLIENT_ID = os.Getenv("GOOGLE_OAUTH2_CLIENT_ID")
+	GOOGLE_OAUTH2_CLIENT_SECRET = os.Getenv("GOOGLE_OAUTH2_CLIENT_SECRET")
+	GOOGLE_OAUTH2_DEFAULT_REDIRECT_URL = os.Getenv("GOOGLE_OAUTH2_DEFAULT_REDIRECT_URL")
 }

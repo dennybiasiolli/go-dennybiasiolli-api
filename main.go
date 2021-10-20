@@ -7,6 +7,7 @@ import (
 
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/common"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
@@ -18,6 +19,7 @@ func main() {
 	// common.GetDB().AutoMigrate(&citazioni.Citazione{})
 
 	app := fiber.New()
+	app.Use(cors.New())
 
 	setupFiberRoutes(app)
 

@@ -85,15 +85,19 @@ func GoogleOauth2(c *fiber.Ctx) error {
 	if code == "" {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
+	redirect_uri := c.Query("redirect_uri")
 	conf := getGoogleOauth2Config()
-	token, err := conf.Exchange(context.Background(), code)
+	if redirect_uri != "" {
+		conf.RedirectURL = redirect_uri
+	}
+	tok, err := conf.Exchange(context.Background(), code)
 	if err != nil {
 		log.Println(err)
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
 	response, err := http.Get(
-		"https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
+		"https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + tok.AccessToken)
 	if err != nil {
 		log.Println(err)
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{

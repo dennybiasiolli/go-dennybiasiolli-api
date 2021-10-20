@@ -45,21 +45,35 @@ func TokenObtain(c *fiber.Ctx) error {
 			IsStaff:  user.IsStaff,
 		},
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(common.JWT_ACCESS_TOKEN_LIFETIME_SECONDS))),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * time.Duration(common.JWT_ACCESS_TOKEN_LIFETIME_MINUTES))),
 			ID:        fmt.Sprintf("%v", time.Now().UnixMilli()),
 		},
 	}
 
 	// Create token
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	// Generate encoded token and send it as response.
-	t, err := token.SignedString([]byte(common.JWT_HMAC_SAMPLE_SECRET))
+	// change to refresh token
+	claims.TokenType = "refresh"
+	claims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Minute * time.Duration(common.JWT_REFRESH_TOKEN_LIFETIME_MINUTES)))
+
+	// Create token
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	// Generate encoded tokens and send it as response.
+	a, err := accessToken.SignedString([]byte(common.JWT_HMAC_SAMPLE_SECRET))
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+	r, err := refreshToken.SignedString([]byte(common.JWT_HMAC_SAMPLE_SECRET))
 	if err != nil {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	return c.JSON(fiber.Map{"access": t})
+	return c.JSON(fiber.Map{
+		"access":  a,
+		"refresh": r,
+	})
 }
 
 func GoogleOauth2Login(c *fiber.Ctx) error {
@@ -137,19 +151,33 @@ func GoogleOauth2(c *fiber.Ctx) error {
 			IsStaff:  user.IsStaff,
 		},
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(common.JWT_ACCESS_TOKEN_LIFETIME_SECONDS))),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * time.Duration(common.JWT_ACCESS_TOKEN_LIFETIME_MINUTES))),
 			ID:        fmt.Sprintf("%v", time.Now().UnixMilli()),
 		},
 	}
 
 	// Create token
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	// Generate encoded token and send it as response.
-	t, err := token.SignedString([]byte(common.JWT_HMAC_SAMPLE_SECRET))
+	// change to refresh token
+	claims.TokenType = "refresh"
+	claims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Minute * time.Duration(common.JWT_REFRESH_TOKEN_LIFETIME_MINUTES)))
+
+	// Create token
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	// Generate encoded tokens and send it as response.
+	a, err := accessToken.SignedString([]byte(common.JWT_HMAC_SAMPLE_SECRET))
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+	r, err := refreshToken.SignedString([]byte(common.JWT_HMAC_SAMPLE_SECRET))
 	if err != nil {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	return c.JSON(fiber.Map{"access": t})
+	return c.JSON(fiber.Map{
+		"access":  a,
+		"refresh": r,
+	})
 }

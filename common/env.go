@@ -26,7 +26,8 @@ var EMAIL_DEFAULT_FROM string
 var EMAIL_DEFAULT_TO string
 
 var JWT_HMAC_SAMPLE_SECRET string
-var JWT_ACCESS_TOKEN_LIFETIME_SECONDS int = 3600
+var JWT_ACCESS_TOKEN_LIFETIME_MINUTES int = 5
+var JWT_REFRESH_TOKEN_LIFETIME_MINUTES int = 1440
 
 var GOOGLE_OAUTH2_CLIENT_ID string
 var GOOGLE_OAUTH2_CLIENT_SECRET string
@@ -61,8 +62,11 @@ func GetEnvVariables(mainFile string, fallbackFile string) {
 	EMAIL_DEFAULT_TO = os.Getenv("EMAIL_DEFAULT_TO")
 
 	JWT_HMAC_SAMPLE_SECRET = os.Getenv("JWT_HMAC_SAMPLE_SECRET")
-	if val, err := strconv.Atoi(os.Getenv("JWT_ACCESS_TOKEN_LIFETIME_SECONDS")); err != nil {
-		JWT_ACCESS_TOKEN_LIFETIME_SECONDS = val
+	if val, err := strconv.Atoi(os.Getenv("JWT_ACCESS_TOKEN_LIFETIME_MINUTES")); err != nil {
+		JWT_ACCESS_TOKEN_LIFETIME_MINUTES = val
+	}
+	if val, err := strconv.Atoi(os.Getenv("JWT_REFRESH_TOKEN_LIFETIME_MINUTES")); err != nil {
+		JWT_REFRESH_TOKEN_LIFETIME_MINUTES = val
 	}
 
 	GOOGLE_OAUTH2_CLIENT_ID = os.Getenv("GOOGLE_OAUTH2_CLIENT_ID")

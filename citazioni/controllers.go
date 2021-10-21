@@ -41,9 +41,7 @@ func CitazioneDetail(c *fiber.Ctx) error {
 
 func CitazioneCreate(c *fiber.Ctx) error {
 	input := new(CreateCitazioneInput)
-	if err := c.BodyParser(input); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
-	}
+	c.BodyParser(input)
 	if err := validator.New().Struct(input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),

@@ -24,6 +24,10 @@ type LoginInput struct {
 	Password string `json:"password" validate:"required"`
 }
 
+type TokenRefreshInput struct {
+	Refresh string `json:"refresh" xml:"refresh" form:"refresh" validate:"required"`
+}
+
 type JwtUserInfo struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`

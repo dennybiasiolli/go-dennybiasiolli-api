@@ -4,6 +4,7 @@ import "github.com/gofiber/fiber/v2"
 
 func JwtTokenRegister(router fiber.Router) {
 	router.Post("/", TokenObtain)
+	router.Post("/refresh/", TokenRefresh)
 }
 
 func Oauth2GoogleRegister(router fiber.Router) {

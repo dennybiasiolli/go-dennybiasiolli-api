@@ -62,10 +62,10 @@ func GetEnvVariables(mainFile string, fallbackFile string) {
 	EMAIL_DEFAULT_TO = os.Getenv("EMAIL_DEFAULT_TO")
 
 	JWT_HMAC_SAMPLE_SECRET = os.Getenv("JWT_HMAC_SAMPLE_SECRET")
-	if val, err := strconv.Atoi(os.Getenv("JWT_ACCESS_TOKEN_LIFETIME_MINUTES")); err != nil {
+	if val, err := strconv.Atoi(os.Getenv("JWT_ACCESS_TOKEN_LIFETIME_MINUTES")); err == nil {
 		JWT_ACCESS_TOKEN_LIFETIME_MINUTES = val
 	}
-	if val, err := strconv.Atoi(os.Getenv("JWT_REFRESH_TOKEN_LIFETIME_MINUTES")); err != nil {
+	if val, err := strconv.Atoi(os.Getenv("JWT_REFRESH_TOKEN_LIFETIME_MINUTES")); err == nil {
 		JWT_REFRESH_TOKEN_LIFETIME_MINUTES = val
 	}
 

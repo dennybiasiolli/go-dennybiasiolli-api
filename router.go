@@ -43,7 +43,7 @@ func setupFiberRoutes(app *fiber.App) {
 				"error": err.Error(),
 			})
 		}
-		err := validator.New().Struct(jsonBody)
+		err := validator.New().Struct(*jsonBody)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": err.Error(),

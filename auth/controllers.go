@@ -60,7 +60,7 @@ func getSignedClaimsFromUser(user *User) (string, string, error) {
 func TokenObtain(c *fiber.Ctx) error {
 	input := new(LoginInput)
 	c.BodyParser(input)
-	if err := validator.New().Struct(input); err != nil {
+	if err := validator.New().Struct(*input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
 		})
@@ -84,7 +84,7 @@ func TokenObtain(c *fiber.Ctx) error {
 func TokenRefresh(c *fiber.Ctx) error {
 	input := new(TokenRefreshInput)
 	c.BodyParser(input)
-	if err := validator.New().Struct(input); err != nil {
+	if err := validator.New().Struct(*input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
 		})

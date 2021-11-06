@@ -3,9 +3,12 @@ package budgest
 import (
 	"errors"
 
+	"github.com/dennybiasiolli/go-dennybiasiolli-api/auth"
 	"github.com/dennybiasiolli/go-dennybiasiolli-api/common"
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func AmbitiList(c *fiber.Ctx) error {
@@ -34,5 +37,38 @@ func AmbitiDetail(c *fiber.Ctx) error {
 	} else if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": err.Error()})
 	}
+	return c.JSON(AmbitoSerializer(ambito))
+}
+
+func AmbitiCreate(c *fiber.Ctx) error {
+	input := new(AmbitoCreateInput)
+	c.BodyParser(input)
+	// if err := c.BodyParser(input); err != nil {
+	// 	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+	// 		"message": err.Error(),
+	// 	})
+	// }
+	if err := validator.New().Struct(*input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	db := common.GetDB()
+	user := c.Locals("user").(auth.User)
+	ambito := Ambito{
+		Owner:          user,
+		OwnerId:        user.ID,
+		Num:            input.Num,
+		Descrizione:    input.Descrizione,
+		IsActive:       *input.IsActive,
+		IsInvestimento: *input.IsInvestimento,
+	}
+	if err := db.Omit(clause.Associations).Create(&ambito).Error; err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+	ambito.Owner = user
 	return c.JSON(AmbitoSerializer(ambito))
 }
